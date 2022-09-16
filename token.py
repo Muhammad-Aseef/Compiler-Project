@@ -1,4 +1,7 @@
 
+from tabnanny import check
+
+
 punct = ['{','}','[',']','(',')',',',':']
 opr = ['=','<','>']
 datatype = ['int', 'float', 'string', 'arr']
@@ -9,10 +12,16 @@ def isPunct(ch):
         return True
     return False
     
-def isOpr(ch):
-    if ch in opr:
-        return True
-    return False
+def isOpr(current, next):
+    if current in opr and next in opr:
+        if next == '=':
+            current += next
+            return current
+        else:
+            return current
+    else:
+        if current in opr:
+            return current
 
 def isDatatype(ch):
     if ch in datatype:
@@ -70,7 +79,7 @@ for f in file:
                     print("punctuator", temp)
                     temp = ""
                     continue
-                if isOpr(temp):
+                if isOpr(temp, f[i+1]):
                     print("operator", temp)
                     temp = ""
                     continue
@@ -79,7 +88,7 @@ for f in file:
                     print("next punctuator", temp)
                     temp = ""
                     continue
-                if isOpr(f[i+1]):
+                if isOpr(f[i+1], f[i+2]):
                     print("next operator", temp)
                     temp = ""
                     continue
