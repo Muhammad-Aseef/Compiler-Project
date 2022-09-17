@@ -1,1 +1,3 @@
-int a = 9.0
+if in==5{
+    print("true")
+}
