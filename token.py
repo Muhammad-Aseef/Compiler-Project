@@ -1,7 +1,4 @@
 
-from pickle import TRUE
-
-
 punct = ['{','}','[',']','(',')',',',':']
 opr = ['=','<','>']
 datatype = ['int', 'float', 'string', 'arr']
@@ -9,11 +6,6 @@ keywords = ['if', 'else', 'while', 'for']
 
 def isPunct(ch):
     if ch in punct:
-        return True
-    return False
-
-def nextOpr(next):
-    if next in opr:
         return True
     return False
     
@@ -50,11 +42,19 @@ for f in file:
     f = f.strip()
     temp = "" 
     oprCheck = False
+    quotation = False
     for i in range(len(f)):
         # means double operator occurs
         if oprCheck:
             oprCheck = False
             continue
+        while quotation:
+            temp += f[i]
+            if i == len(f)-1 or f[i] == '"':
+                quotation = False
+                print("in Quotes:",temp)  # token will be generated for str
+                temp = ""
+            break
         else:
             # if coming is space that means it's breakpoint
             # it can be multiple spaces 
@@ -85,6 +85,11 @@ for f in file:
                     
                 # if temp is empty
                 if not temp:
+                    if f[i] == '"':
+                        temp += f[i]
+                        print("\" occurs:", temp)
+                        quotation = True
+                        continue
                     temp += f[i]
                     # for coming 
                     if isPunct(temp):
@@ -110,6 +115,11 @@ for f in file:
                         continue
                 # if temp is not empty
                 else:
+                    if f[i] == '"':
+                        print("\" occurs:", temp) # token for temp
+                        temp = f[i] # temp is used for token now " will over write temp"
+                        quotation = True
+                        continue
                     temp += f[i]
                     if isPunct(f[i+1]):
                         print("not empty next punctuator", temp)

@@ -24,5 +24,3 @@ for i in range(len(txt)-1):
     else:
         print("else ",temp)
         print(type(temp))
-    
-
