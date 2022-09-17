@@ -60,7 +60,12 @@ for f in file:
             # it can be multiple spaces 
             if not f[i] == " ":
                 if i == len(f)-1:
+                    # temp empty at last
                     if not temp:
+                        if f[i] == '"':
+                            temp += f[i]
+                            print("\" last occurs:", temp) # token for " because it is at last position
+                            continue
                         temp += f[i]
                         if isPunct(temp):
                             print("last punctuator", temp)
@@ -71,6 +76,10 @@ for f in file:
                         print("empty temp (last): does not match to any function which means it is a identifier", temp)
                         continue
                     else:
+                        if f[i] == '"':
+                            print("\" last not empty occurs:", temp) # token for temp
+                            print(f[i]) # token for "
+                            continue
                         temp += f[i]
                         if isKeyword(temp):
                             print("last keyword", temp)
@@ -117,7 +126,7 @@ for f in file:
                 else:
                     if f[i] == '"':
                         print("\" occurs:", temp) # token for temp
-                        temp = f[i] # temp is used for token now " will over write temp"
+                        temp = f[i] # temp is used for token now " will over write temp
                         quotation = True
                         continue
                     temp += f[i]
