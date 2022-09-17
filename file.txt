@@ -1,1 +1,1 @@
-print("jshdshd)
+int a = 9.0

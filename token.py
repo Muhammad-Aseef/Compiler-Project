@@ -1,8 +1,8 @@
 
-punct = ['{','}','[',']','(',')',',',':']
+punct = ['{','}','[',']','(',')',',',':',]
 opr = ['=','<','>']
 datatype = ['int', 'float', 'string', 'arr']
-keywords = ['if', 'else', 'while', 'for']
+keywords = ['if', 'else', 'while', 'for', 'print']
 
 def isPunct(ch):
     if ch in punct:
@@ -69,11 +69,10 @@ for f in file:
                         temp += f[i]
                         if isPunct(temp):
                             print("last punctuator", temp)
-                            continue
-                        if isOpr(temp, 0):
+                        elif isOpr(temp, 0):
                             print("last operator", temp)
-                            continue
-                        print("empty temp (last): does not match to any function which means it is a identifier", temp)
+                        else:
+                            print("empty temp (last): does not match to any function which means it is a identifier:", temp)
                         continue
                     else:
                         if f[i] == '"':
@@ -83,13 +82,10 @@ for f in file:
                         temp += f[i]
                         if isKeyword(temp):
                             print("last keyword", temp)
-                            temp = ""
-                            continue
-                        if isDatatype(temp):
+                        elif isDatatype(temp):
                             print("last datatype", temp)
-                            temp = ""
-                            continue
-                        print("(last) does not match to any function which means it is a identifier", temp)
+                        else:
+                            print("not empty (last) does not match to any function which means it is a identifier:", temp)
                         continue
                     
                 # if temp is empty
@@ -125,17 +121,35 @@ for f in file:
                 # if temp is not empty
                 else:
                     if f[i] == '"':
-                        print("\" occurs:", temp) # token for temp
+                        print("\" not empty occurs:", temp) # token for temp
+                        if isDatatype(temp):
+                            print("not empty Data type", temp) # token
+                        elif isKeyword(temp):
+                            print("not empty keyword", temp) # token
+                        else:
+                            print("not empty does not match to any function which means it is a identifier:", temp)
                         temp = f[i] # temp is used for token now " will over write temp
                         quotation = True
                         continue
                     temp += f[i]
                     if isPunct(f[i+1]):
                         print("not empty next punctuator", temp)
+                        if isDatatype(temp):
+                            print("not empty Data type", temp) # token
+                        elif isKeyword(temp):
+                            print("not empty keyword", temp) # token
+                        else:
+                            print("not empty does not match to any function which means it is a identifier:", temp)
                         temp = ""
                         continue
                     if isOpr(f[i+1], 0):
                         print("not empty next operator", temp)
+                        if isDatatype(temp):
+                            print("not empty Data type", temp) # token
+                        elif isKeyword(temp):
+                            print("not empty keyword", temp) # token
+                        else:
+                            print("not empty does not match to any function which means it is a identifier", temp)
                         temp = ""
                         continue
             else:
