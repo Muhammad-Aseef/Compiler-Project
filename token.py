@@ -65,7 +65,7 @@ for f in file:
                         if isPunct(temp):
                             print("last punctuator", temp)
                             continue
-                        if isOpr(temp):
+                        if isOpr(temp, 0):
                             print("last operator", temp)
                             continue
                         print("empty temp (last): does not match to any function which means it is a identifier", temp)
@@ -104,7 +104,7 @@ for f in file:
                         print("next punctuator", temp)
                         temp = ""
                         continue
-                    if nextOpr(f[i+1]):
+                    if isOpr(f[i+1], 0):
                         print("next operator", temp)
                         temp = ""
                         continue
@@ -112,11 +112,11 @@ for f in file:
                 else:
                     temp += f[i]
                     if isPunct(f[i+1]):
-                        print("next2 punctuator", temp)
+                        print("not empty next punctuator", temp)
                         temp = ""
                         continue
-                    if isOpr(f[i+1]):
-                        print("next2 operator", temp)
+                    if isOpr(f[i+1], 0):
+                        print("not empty next operator", temp)
                         temp = ""
                         continue
             else:
