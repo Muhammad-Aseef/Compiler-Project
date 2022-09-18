@@ -45,6 +45,12 @@ def isKeyword(ch):
 
 file = open('E:\\6thSem\\compiler\\myproject\\file.txt','r')
 lineCount = 0
+temp = "" 
+oprCheck = False
+quotation = False
+inline_comment = False
+comment = False
+
 for f in file:
     if not f.strip():
         print("empty")
@@ -52,21 +58,28 @@ for f in file:
         continue
     lineCount +=  1
     f = f.strip()
-    temp = "" 
-    oprCheck = False
-    quotation = False
     for i in range(len(f)):
         # means double operator occurs
         if oprCheck:
             oprCheck = False
-            continue
-        while quotation:
+        elif quotation:
             temp += f[i]
             if i == len(f)-1 or f[i] == '"':
                 quotation = False
                 print("in Quotes:",temp)  # token will be generated for str
                 temp = ""
-            break
+        elif inline_comment:
+            temp += f[i]
+            if i == len(f)-1:
+                inline_comment = False
+                print("line ends",temp)  # token will be generated for inline_comment str
+                temp = ""
+        elif comment:
+            temp += f[i]
+            if f[i] == '~':
+                comment = False
+                print("comment end",temp)  # token will be generated for inline_comment str
+                temp = ""
         else:
             # if coming is space that means it's breakpoint
             # it can be multiple spaces 
@@ -74,18 +87,36 @@ for f in file:
                 if i == len(f)-1:
                     # temp empty at last
                     if not temp:
-                        if f[i] == '"':
-                            temp += f[i]
-                            print("\" last occurs:", temp) # token for " because it is at last position
-                            continue
                         temp += f[i]
+                        if temp == '"':
+                            print("\" last occurs:", temp) # token for " because it is at last position
+                            temp = ""
+                            continue
+                        if temp == '#':
+                            print("# last occurs:", temp) # token for " because it is at last position
+                            temp = ""
+                            continue
+                        if temp == '~':
+                            print("comment starts", temp)
+                            comment = True
                         checkAll(temp, 'e-l')
+                        temp = ""
                         continue
                     else:
                         if f[i] == '"':
                             print("\" last not empty occurs:", temp) # token for temp
                             print(f[i]) # token for "
+                            temp = ""
                             continue
+                        if f[i] == '#':
+                            print("# last not empty occurs:", temp) # token for temp
+                            print(f[i]) # token for #
+                            temp = ""
+                            continue
+                        if f[i] == '~':
+                            print("comment starts", temp) # token for temp
+                            temp = f[i]
+                            comment = True
                         temp += f[i]
                         checkAll(temp, 'n-l')
                         continue
@@ -93,9 +124,17 @@ for f in file:
                 # if temp is empty
                 if not temp:
                     temp += f[i]
-                    if f[i] == '"':
+                    if temp == '"':
                         print("\" occurs:", temp)
                         quotation = True
+                        continue
+                    if temp == '#':
+                        print("inline_comment starts", temp)
+                        inline_comment = True
+                        continue
+                    if temp == '~':
+                        print("comment starts", temp)
+                        comment = True
                         continue
                     # for coming 
                     if isPunct(temp):
@@ -126,6 +165,15 @@ for f in file:
                         temp = f[i] # temp is used for token now " will over write temp
                         quotation = True
                         continue
+                    if f[i] == '#':
+                        checkAll(temp, 'n-c') # token for temp
+                        temp = f[i] # temp is used for token now # will over write temp
+                        inline_comment = True
+                        continue
+                    if f[i] == '~':
+                        print("comment starts", temp) # token for temp
+                        temp = f[i]
+                        comment = True
                     temp += f[i]
                     # checking next to be punct or opr
                     if isPunct(f[i+1]):
@@ -146,60 +194,3 @@ for f in file:
 
 
 print("line count: ", lineCount)
-
-'''
-# last
-if isKeyword(temp):
-    print("last keyword", temp)
-elif isDatatype(temp):
-    print("last datatype", temp)
-else:
-    print("not empty (last) does not match to any function which means it is a identifier:", temp)
-
-if isPunct(temp):
-    print("last punctuator", temp)
-elif isOpr(temp, 0):
-    print("last operator", temp)
-else:
-    print("empty temp (last): does not match to any function which means it is a identifier:", temp)
-
-
-# not empty
-print("\" not empty occurs:", temp) # token for temp
-if isDatatype(temp):
-    print("not empty Data type", temp) # token
-elif isKeyword(temp):
-    print("not empty keyword", temp) # token
-else:
-    print("not empty does not match to any function which means it is a identifier:", temp)
-
-print("not empty next punctuator", temp)
-if isDatatype(temp):
-    print("not empty Data type", temp) # token
-elif isKeyword(temp):
-    print("not empty keyword", temp) # token
-else:
-    print("not empty does not match to any function which means it is a identifier:", temp)
-
-print("not empty next operator", temp)
-if isDatatype(temp):
-    print("not empty Data type", temp) # token
-elif isKeyword(temp):
-    print("not empty keyword", temp) # token
-else:
-    print("not empty does not match to any function which means it is a identifier", temp)
-
-
-# space
-if isDatatype(temp):
-    print("space", temp)
-    temp = ""
-    continue
-if isKeyword(temp):
-    print("space keyword", temp)
-    temp = ""
-    continue
-print("space, does not match to any function which means it is a identifier", temp)
-temp = ""
-continue
-'''
