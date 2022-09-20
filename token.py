@@ -1,6 +1,3 @@
-import pickle
-
-
 class token:
     def __init__(self, value, type, line):
         self.value = value
@@ -187,6 +184,7 @@ for f in file:
                             continue
                         temp += f[i]
                         checkAll(temp, 'n-l')
+                        temp = ""
                         continue
                     
                 # if temp is empty
@@ -323,14 +321,10 @@ for f in file:
 
 
 print("line count: ", lineCount)
+
+t_file = open('E:\\6thSem\\compiler\\myproject\\token.txt','w')
+data = ""
 for i in tokens:
     print(i.type , i.value)
-
-# token file
-# t_file = open('test.pkl','wb')
-# for j in tokens:
-#     pickle.dump(j, t_file, pickle.HIGHEST_PROTOCOL)
-
-# read_file = open('test.pkl','rb')
-# c = pickle.load(read_file)
-# print(c.type)
+    data += i.type + ", " + i.value + ", " + str(i.line) + "\n"
+t_file.write(data)
