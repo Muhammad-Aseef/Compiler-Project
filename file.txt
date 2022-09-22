@@ -1,12 +1,2 @@
-int a,b = 5
-
-~ hsdkks
-print("nice")
-while True {
-    print("yes")
-}
-~
-while (a=5) {
-    print(a)
-    a--
-}
+d++
+yeild d

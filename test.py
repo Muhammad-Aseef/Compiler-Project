@@ -1,28 +1,17 @@
-# opr = ['=','<','>']
-# oprCheck = True
+# def isAirth(current):
+#     for i in airth:
+#         if i[0] == current:
+#             return i[1]
+#     return False
 
-# def isOpr(current, next):
-#     if current in opr and next in opr:
-#         if next == '=':
-#             current += next
-#             return current
-#         else:
-#             return current
+# txt = "+-"
+
+# for i in range(len(txt)):
+#     isAir = isAirth(txt[i])
+#     if isAirth(txt[i]):
+#         print(txt[i],isAir)
 #     else:
-#         if current in opr:
-#             return current
-#         return False
-
-# txt = "=>"
-
-# for i in range(len(txt)-1):
-#     temp = isOpr(txt[i], txt[i+1])
-#     if temp:
-#         print(temp)
-#         print(type(temp))
-#     else:
-#         print("else ",temp)
-#         print(type(temp))
+#         print(txt[i])
 
 # a = "nice"
 # if a == "nce":

@@ -1,21 +1,4 @@
-data type, int, 1
-regex, a, 1
-punctuator, ,, 1
-regex, b, 1
-operator, =, 1
-regex, 5, 1
-comment, ~ hsdkksprint("nice")while True {print("yes")}~, 8
-keyword, while, 9
-punctuator, (, 9
-regex, a, 9
-operator, =, 9
-regex, 5, 9
-punctuator, ), 9
-punctuator, {, 9
-keyword, print, 10
-punctuator, (, 10
-regex, a, 10
-punctuator, ), 10
-regex, a, 11
-inc_dec, --, 11
-punctuator, }, 12
+regex, d, 1
+inc_dec, ++, 1
+yield, yeild, 2
+regex, d, 2

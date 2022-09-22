@@ -4,90 +4,95 @@ class token:
         self.type = type
         self.line = line
 
-
 tokens = []
-punct = ['{','}','[',']','(',')',',',':']
-opr = ['=','<','>']
-airth = ['+', '-', '*', '/']
-inc_dec = ['++', '--']
-log_opr = ['&&', '||','!']
-datatype = ['int', 'float', 'string', 'arr']
-keywords = ['if', 'else', 'while', 'for', 'print']
+punct = ['{','}','[',']','(',')',',',':',';']
+rel_opr = [['>','ROP'], ['<','ROP'], ['>=','ROP'], ['<=','ROP'], ['==','ROP'], ['!=','ROP']]
+airth = [['+','PM'], ['-','PM'], ['*','MDM'], ['/','MDM'], ['%','MDM']]
+inc_dec = [['++','inc_dec'], ['--','inc_dec']]
+# assign = [['=','AOP']]
+log_opr = [['&&','LOP'], ['||','LOP'], ['!','LOP']]
+keywords = [
+    ['const','VM'], ['let','VM'], ['int','DT'], ['float','DT'], ['string','DT'], ['array','DT'], ['boolean','DT'],['char','DT'],
+    ['if','if'], ['else','else'], ['ifthen','ifthen'], ['interval','interval'], ['stop','stop'], ['carryon','carryon'],
+    ['func','func'], ['yeild','yield'], ['class','class'],['constructor','constructor'], ['public','AM'], ['private','AM'],
+    ]
 
 def checkAll(temp, p):
-        if isPunct(temp):
-            print(f"{p}: punctuator {temp}")
-            tokens.append(token(temp,'punctuator',lineCount))
-        elif isOpr(temp, 0):
-            print(f"{p}: operator {temp}")
-            tokens.append(token(temp,'operator',lineCount))
-        elif isAirth(temp, 0):
-            print(f"{p}: airthmatic {temp}")
-            tokens.append(token(temp,'airthmatic operator',lineCount))
-        elif isLogOpr(temp, 0):
-            print(f"{p}: logical {temp}")
-            tokens.append(token(temp,'logical operator',lineCount))
-        elif isKeyword(temp):
-            print(f"{p}: keyword {temp}")
-            tokens.append(token(temp,'keyword',lineCount))
-        elif isDatatype(temp):
-            print(f"{p}: datatype {temp}")
-            tokens.append(token(temp,'data type',lineCount))
-        else:
-            print(f"{p}: does not match to any function which means it is a identifier: {temp}")
-            tokens.append(token(temp,'regex',lineCount))
+    c = isPunct(temp)
+    if c:
+        return tokens.append(token(temp,'punctuator',lineCount))
+    c = isAirth(temp)
+    if c:
+        return tokens.append(token(temp,c,lineCount))
+    c = isRelOpr(temp, '0')
+    if c:
+        return tokens.append(token(temp,c,lineCount))
+    c = isLogOpr(temp, '0')
+    if c:
+        return tokens.append(token(temp,c,lineCount))
+    c = isKeyword(temp)
+    if c:
+        return tokens.append(token(temp,c,lineCount))
+    else:
+        print("does not match to any function which means it is a identifier:", temp)
+        return tokens.append(token(temp,'regex',lineCount))
 
 def isPunct(ch):
     if ch in punct:
         return True
     return False
-    
-def isOpr(current, next):
-    if current in opr and next in opr:
-        if next == '=':
-            current += next
-            return current
-        else:
-            return current
-    else:
-        if current in opr:
-            return current
-        return False
 
-def isAirth(current, next):
-    if current in airth and next in airth:
-        x = current + next
-        if x in inc_dec:
-            return x
-        return current
-    else:
-        if current in airth:
-            return current
-        return False
+def isRelOpr(current, next):
+    x = current + next
+    for i in rel_opr:
+        if i[0] == x:
+            return x,i[1]
+    for j in rel_opr:
+        if j[0] == current:
+            return j[1]
+    return False
+
+def isInc_Dec(current, next):
+    x = current + next
+    for i in inc_dec:
+        if i[0] == x:
+            return x, i[1]
+    return False
+
+def isAirth(current):
+    for i in airth:
+        if i[0] == current:
+            return i[1]
+    return False
+
+# def isAssign(current, next):
+#     x = current + next
+#     for i in assign:
+#         if i[0] == x:
+#             return x,i[1]
+#     for j in assign:
+#         if j[0] == current:
+#             return j[1]
+#     return False
 
 def isLogOpr(current, next):
-    if current == '&' or current == '|':
-        x = current + next
-        if x in log_opr:
-            return x
-        return False
-    else:
-        if current in log_opr:
-            return current
-            
-
-def isDatatype(ch):
-    if ch in datatype:
-        return True
+    x = current + next
+    for i in log_opr:
+        if i[0] == x:
+            return x,i[1]
+    for j in log_opr:
+        if j[0] == current:
+            return j[1]
     return False
-    
-def isKeyword(ch):
-    if ch in keywords:
-        return True
+            
+def isKeyword(current):
+    for i in keywords:
+        if i[0] == current:
+            return i[1]
     return False
 
 # to read code file
-file = open('E:\\6thSem\\compiler\\myproject\\file.txt','r')
+file = open('file.txt','r')
 
 # to write token objects
 # t_file = open('E:\\6thSem\\compiler\\myproject\\token.txt','a')
@@ -203,70 +208,57 @@ for f in file:
                         print("comment starts", temp)
                         comment = True
                         continue
-                    if temp == '!' and f[i+1] == '=':
-                        temp += f[i+1]
-                        print("not equal operator: ", temp)
-                        tokens.append(token(temp,'not equal',lineCount))
-                        oprCheck = True
-                        temp = ""
-                        continue
                     if isPunct(temp):
-                        print("punctuator", temp)
                         tokens.append(token(temp,"punctuator",lineCount))
                         temp = ""
                         continue
-                    isOp = isOpr(temp, f[i+1])
-                    if isOp:
-                        print("operator:", isOp)
-                        tokens.append(token(isOp,'operator',lineCount))
-                        if len(isOp) == 2:
+                    y = isInc_Dec(temp, f[i+1])
+                    if y:
+                        tokens.append(token(y[0],y[1],lineCount))
+                        oprCheck = True
+                        temp = ""
+                        continue
+                    y = isAirth(temp)
+                    if y:
+                        tokens.append(token(temp,y,lineCount))
+                        temp = ""
+                        continue
+                    # y = isAssign(temp)
+                    # if y:
+                    #     print("assign:", y)
+                    #     tokens.append(token(temp,y,lineCount))
+                    #     temp = ""
+                    #     continue   
+                    y = isRelOpr(temp, f[i+1])
+                    if y:
+                        tokens.append(token(y[0],y[1],lineCount))
+                        if len(y) == 2:
                             oprCheck = True
                         temp = ""
                         continue
-                    isLogop = isLogOpr(temp, f[i+1])
-                    if isLogop:
-                        print("logicl operator:", isLogop)
-                        tokens.append(token(isLogop,'logical operator',lineCount))
-                        if len(isLogop) == 2:
+                    y = isLogOpr(temp, f[i+1])
+                    if y:
+                        tokens.append(token(y[0],y[1],lineCount))
+                        if len(y) == 2:
                             oprCheck = True
-                        temp = ""
-                        continue
-                    isAir = isAirth(temp, f[i+1])
-                    if isAir:
-                        if len(isAir) == 1:
-                            print("airthmatic operator:", isAir)
-                            tokens.append(token(isAir,'airthmatic operator',lineCount))
-                        else:
-                            print("inc_dec:", isAir)
-                            tokens.append(token(isAir,'inc_dec',lineCount))
-                            oprCheck = True   
                         temp = ""
                         continue
                     # for next 
                     # regex will be applied to temp
-                    if f[i+1] == '!' and f[i+2] == '=':
-                        print("next not equal operator: ", temp)
-                        tokens.append(token(temp,'regex',lineCount))
-                        temp = ""
-                        continue
                     if isPunct(f[i+1]):
-                        # token for identifier because coming value is of length 1 and is not punct or opr
-                        print("next punctuator", temp)
+                        # token for identifier or digit because coming value is of length 1 and is not punct or opr
                         tokens.append(token(temp,'regex',lineCount))
                         temp = ""
                         continue
-                    if isOpr(f[i+1], 0):
-                        print("next operator", temp)
+                    if isAirth(f[i+1]):
                         tokens.append(token(temp,'regex',lineCount))
                         temp = ""
                         continue
-                    if isAirth(f[i+1], 0):
-                        print("next airthmatic operator", temp)
+                    if isRelOpr(f[i+1], '0'):
                         tokens.append(token(temp,'regex',lineCount))
                         temp = ""
                         continue
-                    if isLogOpr(f[i+1], 0):
-                        print("next logical operator", temp)
+                    if isLogOpr(f[i+1], '0'):
                         tokens.append(token(temp,'regex',lineCount))
                         temp = ""
                         continue
@@ -290,24 +282,20 @@ for f in file:
                     
                     temp += f[i]
                     # checking next to be punct or opr
-                    if f[i+1] == '!' and i != len(f)-2 and f[i+2] == '=':
-                        print("not empty next not equal operator: ", temp)
-                        tokens.append(token(temp,'regex',lineCount))
-                        temp = ""
-                        continue
+                    # here checkall is called for temp to be keyword / dt / identifier
                     if isPunct(f[i+1]):
                         checkAll(temp, 'n-n-p')
                         temp = ""
                         continue
-                    if isOpr(f[i+1], 0):
+                    if isRelOpr(f[i+1], '0'):
                         checkAll(temp, 'n-n-o')
                         temp = ""
                         continue
-                    if isAirth(f[i+1], 0):
-                        checkAll(temp, 'n-n-a')
+                    if isAirth(f[i+1]):
+                        checkAll(temp, 'n-n-a/i_d')
                         temp = ""
                         continue
-                    if isLogOpr(f[i+1], 0):
+                    if isLogOpr(f[i+1], '0'):
                         checkAll(temp, 'n-n-lo')
                         temp = ""
                         continue
@@ -322,7 +310,7 @@ for f in file:
 
 print("line count: ", lineCount)
 
-t_file = open('E:\\6thSem\\compiler\\myproject\\token.txt','w')
+t_file = open('token.txt','w')
 data = ""
 for i in tokens:
     print(i.type , i.value)
