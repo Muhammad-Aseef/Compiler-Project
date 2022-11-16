@@ -11,10 +11,10 @@ punct = [['{','{'], ['}','}'], ['[','['], [']',']'], ['(','('], [')',')'], [',',
 rel_opr = [['>','rop'], ['<','rop'], ['>=','rop'], ['<=','rop'], ['==','rop'], ['!=','rop']]
 airth = [['+','pm'], ['-','pm'], ['*','mdm'], ['/','mdm'], ['%','mdm']]
 inc_dec = [['++','inc_dec'], ['--','inc_dec']]
-assign = [['=','aop'], ['+=','cop'], ['-=','cop'],['*=','cop'], ['/=','cop'],]
-log_opr = [['&&','and'], ['||','or'], ['!','not']]
+assign = [['=','='], ['+=','cop'], ['-=','cop'],['*=','cop'], ['/=','cop'],]
+log_opr = [['&&','&&'], ['||','||'], ['!','!']]
 keywords = [
-    ['const','vm'], ['let','vm'], ['int','DT'], ['float','DT'], ['string','DT'], ['array','dt'], ['boolean','DT'],['char','DT'],
+    ['const','vm'], ['let','vm'], ['int','dt'], ['float','dt'], ['string','dt'], ['array','array'], ['boolean','dt'],
     ['if','if'], ['else','else'], ['ifthen','ifthen'], ['interval','interval'], ['stop','stop'], ['carryon','carryon'],
     ['func','func'], ['yeild','yield'], ['class','class'],['constructor','constructor'], ['public','am'], ['private','am'],
     ['true','boolconst'], ['false','boolconst']
@@ -41,7 +41,6 @@ def checkAll(temp):
         return tokens.append(token(temp,c,lineCount))
     else:
         c = checkRegex(temp)
-        # print("does not match to any function which means it is a identifier:", temp)
         return tokens.append(token(temp,c,lineCount))
 
 def isPunct(current):
@@ -108,7 +107,11 @@ def checkRegex(temp):
     if digit and digit.group() == temp:
         return 'digitconst'
     
-    return 'false'
+    float = re.match(r'[0-9]+\.[0-9]+', temp)
+    if float and float.group() == temp:
+        return 'floatconst'
+
+    return 'invalid token'
 
 # to read code file
 file = open('file.txt','r')
@@ -122,7 +125,6 @@ comment = False
 
 for f in file:
     if not f.strip():
-        print("empty")
         lineCount += 1
         continue
     lineCount +=  1
@@ -136,7 +138,7 @@ for f in file:
             if i == len(f)-1 or f[i] == '"':
                 quotation = False
                 # token will be generated for str 
-                tokens.append(token(temp,'string',lineCount))
+                tokens.append(token(temp,'stringconst',lineCount))
                 temp = ""
         elif inline_comment:
             temp += f[i]
@@ -171,8 +173,11 @@ for f in file:
                             temp = ""
                             continue
                         if temp == '~':
-                            print("comment starts", temp)
                             comment = True
+                            continue
+                        if temp == '.':
+                            tokens.append(token(temp,'.',lineCount))
+                            temp = ""
                             continue
                         checkAll(temp)
                         temp = ""
@@ -201,6 +206,13 @@ for f in file:
                             temp = f[i]
                             comment = True
                             continue
+                        if f[i] == '.':
+                            #token for temp
+                            z = checkRegex(temp)
+                            tokens.append(token(temp,z,lineCount))
+                            # token for .
+                            tokens.append(token(f[i],'.',lineCount))
+                            continue
                         temp += f[i]
                         checkAll(temp)
                         temp = ""
@@ -218,6 +230,10 @@ for f in file:
                         continue
                     if temp == '~':
                         comment = True
+                        continue
+                    if temp == '.':
+                        tokens.append(token(temp,'.',lineCount))
+                        temp = ""
                         continue
                     y = isPunct(temp)
                     if y:
@@ -264,6 +280,11 @@ for f in file:
                         continue
                     # for next 
                     # regex will be applied to temp
+                    if f[i+1] == '.':
+                        z = checkRegex(temp)
+                        tokens.append(token(temp,z,lineCount))
+                        temp = ""
+                        continue
                     if isPunct(f[i+1]):
                         # token for identifier or digit because coming value is of length 1 and is not punct or opr
                         z = checkRegex(temp)
@@ -271,14 +292,22 @@ for f in file:
                         temp = ""
                         continue
                     if isRelOpr(f[i+1], '0'):
+                        z = checkRegex(temp)
                         tokens.append(token(temp,z,lineCount))
                         temp = ""
                         continue
                     if isAirth(f[i+1]):
+                        z = checkRegex(temp)
                         tokens.append(token(temp,z,lineCount))
                         temp = ""
-                        continue                    
+                        continue
+                    if isAssign(f[i+1], '0'):
+                        z = checkRegex(temp)
+                        tokens.append(token(temp,z,lineCount))
+                        temp = ""
+                        continue                
                     if isLogOpr(f[i+1], '0'):
+                        z = checkRegex(temp)
                         tokens.append(token(temp,z,lineCount))
                         temp = ""
                         continue
@@ -299,10 +328,14 @@ for f in file:
                         temp = f[i] # temp is used for token now ~ will over write temp
                         comment = True
                         continue
-                    
+                                         
                     temp += f[i]
                     # checking next to be punct or opr
-                    # here checkall is called for temp to be keyword / dt / identifier
+                    # # here checkall is called for temp to be keyword / dt / identifier
+                    # if f[i+1] == '.':
+                    #     checkAll(temp)
+                    #     temp = ""
+                    #     continue
                     if isPunct(f[i+1]):
                         checkAll(temp)
                         temp = ""
@@ -312,6 +345,10 @@ for f in file:
                         temp = ""
                         continue
                     if isAirth(f[i+1]):
+                        checkAll(temp)
+                        temp = ""
+                        continue
+                    if isAssign(f[i+1], '0'):
                         checkAll(temp)
                         temp = ""
                         continue
@@ -330,9 +367,12 @@ for f in file:
 
 print("line count: ", lineCount)
 
-t_file = open('token.txt','w')
-data = ""
-for i in tokens:
-    print(i.type , i.value)
-    data += i.type + ", " + i.value + ", " + str(i.line) + "\n"
-t_file.write(data)
+def result():
+    tokens.append(token('$','$',lineCount+1))
+    t_file = open('token.txt','w')
+    data = ""
+    for i in tokens:
+        # print(i.value,i.type)
+        data += i.value + ", " + i.type + ", " + str(i.line) + "\n"
+    t_file.write(data)
+    return tokens

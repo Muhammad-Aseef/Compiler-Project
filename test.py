@@ -1,5 +1,7 @@
+def a(b):
+    print(b)
 
-
+a(b = 5)
 # def isAirth(current):
 #     for i in airth:
 #         if i[0] == current:
